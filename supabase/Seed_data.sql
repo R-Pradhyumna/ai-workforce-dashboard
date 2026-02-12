@@ -80,22 +80,22 @@ alter table public.ai_usage_logs enable row level security;
 create policy if not exists "authenticated_read_profiles"
 on public.profiles
 for select
-using (auth.role() = 'authenticated');
+using ((select auth.role()) = 'authenticated');
 
 create policy if not exists "authenticated_read_teams"
 on public.teams
 for select
-using (auth.role() = 'authenticated');
+using ((select auth.role()) = 'authenticated');
 
 create policy if not exists "authenticated_read_models"
 on public.ai_models
 for select
-using (auth.role() = 'authenticated');
+using ((select auth.role()) = 'authenticated');
 
 create policy if not exists "authenticated_read_usage_logs"
 on public.ai_usage_logs
 for select
-using (auth.role() = 'authenticated');
+using ((select auth.role()) = 'authenticated');
 
 -- ============================================================
 -- 4. TRIGGER FOR AUTO PROFILE CREATION
@@ -195,27 +195,27 @@ insert into public.ai_usage_logs (
   created_at
 )
 select
-  p.id,
-  m.id,
+  employees[(floor(random() * array_length(employees, 1)) + 1)::int] as employee_id,
+  models[(floor(random() * array_length(models, 1)) + 1)::int] as model_id,
   tokens,
-  round((tokens / 1000.0) * m.cost_per_1k_tokens, 4),
+  round((tokens / 1000.0) * model_costs[
+    (floor(random() * array_length(models, 1)) + 1)::int
+  ], 4),
   category,
   now() - (random() * interval '180 days')
-from generate_series(1, 300)
-cross join lateral (
-  select id
+from generate_series(1, 300),
+lateral (
+  select array_agg(id) as employees
   from public.profiles
   where role = 'employee'
-  order by random()
-  limit 1
-) p
-cross join lateral (
-  select id, cost_per_1k_tokens
+) emp,
+lateral (
+  select
+    array_agg(id) as models,
+    array_agg(cost_per_1k_tokens) as model_costs
   from public.ai_models
-  order by random()
-  limit 1
-) m
-cross join lateral (
+) mod,
+lateral (
   select
     (floor(random() * 5800) + 200)::int as tokens,
     (array['development','research','hr','marketing','ops'])
