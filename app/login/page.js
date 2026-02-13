@@ -2,7 +2,7 @@
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 export default function LoginPage() {
   const supabase = createSupabaseBrowserClient();
@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("Jojo2004++");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -29,8 +30,9 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/dashboard");
-    router.refresh();
+    startTransition(() => {
+      router.push("/dashboard");
+    });
   }
 
   return (
