@@ -2,7 +2,7 @@
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 
 export default function LoginPage() {
   const supabase = createSupabaseBrowserClient();
@@ -12,14 +12,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState("Jojo2004++");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isPending, startTransition] = useTransition();
 
   async function handleLogin(e) {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -30,9 +29,11 @@ export default function LoginPage() {
       return;
     }
 
-    startTransition(() => {
-      router.push("/dashboard");
-    });
+    await supabase.auth.getSession();
+
+    await new Promise((res) => setTimeout(res, 150));
+
+    router.replace("/dashboard");
   }
 
   return (

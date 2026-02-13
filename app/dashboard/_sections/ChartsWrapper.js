@@ -21,9 +21,15 @@ export default async function ChartsWrapper({ searchParams }) {
 
   return (
     <>
-      <TrendChart data={trend} />
-      <CategoryChart data={categories} />
-      <RankingChart data={ranking} />
+      <section id="trend">
+        <TrendChart data={trend} />
+      </section>
+      <section id="category">
+        <CategoryChart data={categories} />
+      </section>
+      <section id="ranking">
+        <RankingChart data={ranking} />
+      </section>
     </>
   );
 }

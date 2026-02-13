@@ -11,7 +11,9 @@ export default function DashboardPage({ searchParams }) {
           <div className="h-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
         }
       >
-        <KpiSectionWrapper searchParams={searchParams} />
+        <section id="overview">
+          <KpiSectionWrapper searchParams={searchParams} />
+        </section>
       </Suspense>
 
       <Suspense
@@ -27,7 +29,9 @@ export default function DashboardPage({ searchParams }) {
           <div className="h-125 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
         }
       >
-        <TableWrapper searchParams={searchParams} />
+        <section id="table">
+          <TableWrapper searchParams={searchParams} />
+        </section>
       </Suspense>
     </div>
   );
