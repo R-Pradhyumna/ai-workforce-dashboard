@@ -186,6 +186,16 @@ where m.role = 'manager'
 truncate table public.ai_usage_logs cascade;
 
 -- Insert 300 usage rows
+with employees as (
+  select array_agg(id) as emp_ids
+  from public.profiles
+  where role = 'employee'
+),
+models as (
+  select array_agg(id) as model_ids,
+         array_agg(cost_per_1k_tokens) as model_costs
+  from public.ai_models
+)
 insert into public.ai_usage_logs (
   employee_id,
   model_id,
@@ -195,32 +205,30 @@ insert into public.ai_usage_logs (
   created_at
 )
 select
-  employees[(floor(random() * array_length(employees, 1)) + 1)::int] as employee_id,
-  models[(floor(random() * array_length(models, 1)) + 1)::int] as model_id,
-  tokens,
-  round((tokens / 1000.0) * model_costs[
-    (floor(random() * array_length(models, 1)) + 1)::int
-  ], 4),
-  category,
-  now() - (random() * interval '180 days')
+  emp_ids[(floor(random() * array_length(emp_ids, 1)) + 1)::int] as employee_id,
+
+  model_ids[(floor(random() * array_length(model_ids, 1)) + 1)::int] as model_id,
+
+  (floor(random() * 8000) + 200)::int as tokens_used,
+
+  round(
+    (
+      (floor(random() * 8000) + 200)::int
+      / 1000.0
+    )
+    *
+    model_costs[(floor(random() * array_length(model_ids, 1)) + 1)::int],
+    4
+  ) as cost_usd,
+
+  (array['development','research','hr','marketing','ops'])
+    [(floor(random() * 5) + 1)::int] as category,
+
+  now() - (random() * interval '180 days') as created_at
+
 from generate_series(1, 300),
-lateral (
-  select array_agg(id) as employees
-  from public.profiles
-  where role = 'employee'
-) emp,
-lateral (
-  select
-    array_agg(id) as models,
-    array_agg(cost_per_1k_tokens) as model_costs
-  from public.ai_models
-) mod,
-lateral (
-  select
-    (floor(random() * 5800) + 200)::int as tokens,
-    (array['development','research','hr','marketing','ops'])
-      [floor(random()*5)+1] as category
-) data;
+employees,
+models;
 
 alter table public.profiles force row level security;
 alter table public.teams force row level security;
