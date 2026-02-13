@@ -8,8 +8,8 @@ export default function LoginPage() {
   const supabase = createSupabaseBrowserClient();
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("admin@test.com");
+  const [password, setPassword] = useState("Jojo2004++");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
