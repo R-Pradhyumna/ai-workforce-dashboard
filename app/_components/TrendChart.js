@@ -1,7 +1,10 @@
 "use client";
 
+import Card from "@/app/_components/ui/Card";
+import SectionHeader from "@/app/_components/ui/SectionHeader";
 import {
   CartesianGrid,
+  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -11,8 +14,6 @@ import {
 } from "recharts";
 
 export default function TrendChart({ data }) {
-  if (!data?.length) return <p>No trend data</p>;
-
   const formattedData = data.map((item) => ({
     ...item,
     day: new Date(item.day).toLocaleDateString("en-IN", {
@@ -22,24 +23,37 @@ export default function TrendChart({ data }) {
   }));
 
   return (
-    <section>
-      <h2>Usage Trend</h2>
-      <div style={{ width: "100%", height: 300 }}>
+    <Card>
+      <SectionHeader title="Usage Trend" />
+
+      <div className="h-75">
         <ResponsiveContainer>
           <LineChart data={formattedData}>
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid
+              stroke="rgba(148,163,184,0.2)"
+              strokeDasharray="3 3"
+            />
             <XAxis dataKey="day" />
             <YAxis />
-            <Tooltip />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "var(--surface)",
+                border: "1px solid var(--border)",
+                borderRadius: "8px",
+              }}
+            />
+            <Legend />
             <Line
               type="monotone"
               dataKey="total_tokens"
-              stroke="#2563eb"
+              stroke="#6366F1"
               strokeWidth={2}
+              dot={{ r: 3 }}
+              activeDot={{ r: 6 }}
             />
           </LineChart>
         </ResponsiveContainer>
       </div>
-    </section>
+    </Card>
   );
 }
