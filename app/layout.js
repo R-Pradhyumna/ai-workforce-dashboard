@@ -30,7 +30,7 @@ export const metadata = {
     "workforce analytics",
   ],
   authors: [{ name: "Your Name" }],
-  metadataBase: new URL("http://localhost:3000"), // change when deployed
+  metadataBase: new URL("https://ai-workforce-dashboard.vercel.app/"),
   openGraph: {
     title: "AI Workforce Dashboard",
     description:
